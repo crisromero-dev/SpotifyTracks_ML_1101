@@ -1,0 +1,74 @@
+{
+  "semilla": 42,
+  "filas_train": 68704,
+  "filas_test": 17155,
+  "columnas_base": [
+    "explicit",
+    "danceability",
+    "energy",
+    "loudness",
+    "mode",
+    "speechiness",
+    "acousticness",
+    "liveness",
+    "valence",
+    "tempo",
+    "track_genre",
+    "n_generos",
+    "duracion_min",
+    "n_artistas",
+    "es_instrumental",
+    "compas_4_4"
+  ],
+  "columnas_procesado_ev1": [
+    "explicit",
+    "danceability",
+    "energy",
+    "loudness",
+    "mode",
+    "speechiness",
+    "acousticness",
+    "liveness",
+    "valence",
+    "tempo",
+    "n_generos",
+    "duracion_min",
+    "n_artistas",
+    "es_instrumental",
+    "compas_4_4",
+    "genero_codificado"
+  ],
+  "columnas_binarias": [
+    "explicit",
+    "mode",
+    "es_instrumental",
+    "compas_4_4"
+  ],
+  "columnas_continuas_procesado_ev1": [
+    "danceability",
+    "energy",
+    "loudness",
+    "speechiness",
+    "acousticness",
+    "liveness",
+    "valence",
+    "tempo",
+    "n_generos",
+    "duracion_min",
+    "n_artistas",
+    "genero_codificado"
+  ],
+  "columnas_con_yeo_johnson": [
+    "loudness",
+    "speechiness",
+    "liveness",
+    "n_generos",
+    "duracion_min",
+    "n_artistas"
+  ],
+  "baseline_media": {
+    "mae_test": 16.8254,
+    "rmse_test": 20.1465
+  },
+  "division": "GroupShuffleSplit(test_size=0.2) agrupado por artista + titulo"
+}
