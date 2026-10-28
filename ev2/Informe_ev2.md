@@ -14,7 +14,7 @@
 ## Resumen
 
 - **Pregunta:** ¿preparar los datos segun lo que necesita cada modelo mejora los resultados frente a usar la preparacion de la EV1 para todos?
-- **Metodo:** solo cambia la preparacion; los modelos usan sus parametros por defecto. Para cada modelo se probaron hipotesis una a una, sacadas de su documentacion o del EDA: se cambia una cosa, se mide en validacion cruzada y se adopta solo si mejora mas que el ruido.
+- **Metodo:** solo cambia la preparacion; los modelos usan sus parametros por defecto. Para cada modelo se probaron hipotesis una a una, sacadas de su documentacion o del EDA: se cambia una cosa, se mide en validacion cruzada y se adopta solo si mejora mas que el ruido. Al final se prueba tambien todo junto.
 - **Respuesta: si en los dos modelos de arboles, no en Ridge.** XGBoost baja su MAE de prueba de 11,30 a 10,64 con el genero como categoria nativa, y Random Forest de 10,99 a 10,85 con el genero en one-hot. Para Ridge, la preparacion de la EV1 ya era la adecuada.
 - **Veredicto:** ningun modelo cumple los seis criterios de exito de la EV1. **XGBoost con preparacion propia es el mejor candidato** (37% menos error que la linea base), pero todavia no es apto: le faltan R², RMSE, error en exitos y control del sobreajuste.
 - **Que explica la popularidad:** el genero (72% de la importancia). Los exitos se subestiman en unos 29 puntos.
@@ -72,6 +72,7 @@ Es una **regresion supervisada**: el objetivo `popularity` es numerico y hay eje
 | X1 | XGBoost | Quitar Yeo-Johnson y escalado no cambia el resultado | Documentacion | Confirmada |
 | X2 | XGBoost | El genero como categoria nativa mejora el resultado | Documentacion | Confirmada |
 | X3 | XGBoost | Recuperar `instrumentalness` y `key` mejora el resultado | Propia (EV1) | No confirmada |
+| T | Los tres | Todos los cambios propuestos juntos mejoran a algun modelo | Propia | No confirmada |
 
 **Criterios de exito** (fijados en la EV1; no se cambian):
 
@@ -140,7 +141,7 @@ Limpieza, cinco variables construidas (`duracion_min`, `n_artistas`, `n_generos`
 
 ### 5.2 Metodo: una hipotesis a la vez
 
-Para cada modelo, desde la preparacion de la EV1: **hipotesis** (segun la documentacion o una idea propia), **prueba** (se cambia una sola cosa y se mide con validacion cruzada), **veredicto** (regla de la seccion 2) y **decision** (si mejora, la siguiente hipotesis parte de ahi). La prueba no participa en ninguna decision.
+Para cada modelo, desde la preparacion de la EV1: **hipotesis** (segun la documentacion o una idea propia), **prueba** (se cambia una sola cosa y se mide con validacion cruzada), **veredicto** (regla de la seccion 2) y **decision** (si mejora, la siguiente hipotesis parte de ahi). Al final, cada modelo se prueba ademas con todos los cambios juntos (5.6). La prueba no participa en ninguna decision.
 
 ### 5.3 Ridge
 
@@ -189,6 +190,18 @@ Ademas de no necesitar transformaciones, XGBoost puede recibir el genero como ca
 
 **Balance de la bitacora.** De 10 cambios, 2 mejoran (F2 y X2, ambos sobre como se entrega el genero), 8 no tienen efecto y ninguno empeora mas que el ruido. Dos de los cambios sin efecto se adoptan por simplicidad (F1 y X1).
 
+### 5.6 Todo junto
+
+El paso a paso descarta un cambio si por separado no supera el ruido, pero varios cambios pequeños podrian sumar cuando se aplican a la vez. Por eso, al final, cada modelo se probo con **todos los cambios propuestos juntos** y se comparo con su preparacion del paso a paso. En Ridge se dejo fuera R3, porque quitar Yeo-Johnson iba en contra de su hipotesis.
+
+| Modelo | Cambios juntos | MAE paso a paso | MAE todo junto | Diferencia (ruido) | Folds que mejoran | Veredicto |
+|---|---|---|---|---|---|---|
+| Ridge | R1 + R2 + R4 | 11,467 | 11,433 | -0,034 (0,046) | 5 de 5 | Sin efecto |
+| Random Forest | F1 + F2 + F3 | 10,828 | 10,833 | +0,005 (0,079) | 2 de 5 | Sin efecto |
+| XGBoost | X1 + X2 + X3 | 10,655 | 10,646 | -0,009 (0,085) | 2 de 5 | Sin efecto |
+
+En Ridge los efectos pequeños si se suman (-0,034 contra -0,016 y -0,012 por separado), pero siguen bajo el ruido y Ridge pasaria de 16 a 146 columnas. **Ningun modelo mejora con todo junto**, asi que las preparaciones del paso a paso son las finales.
+
 *Detalle tecnico: notebook_ev2.ipynb, secciones 4 y 5.*
 
 ## 6. Justificacion de los 3 modelos
@@ -219,7 +232,7 @@ Las 15 variables que no son el genero son las mismas en los seis casos: 11 conti
 
 - **Pipelines.** Cada preparacion se encadena con su modelo en un `Pipeline` (`ColumnTransformer` + modelo). En cada fold, el escalado, Yeo-Johnson y la codificacion del genero se ajustan solo con las filas de entrenamiento de ese fold.
 - **Validacion.** `GroupKFold` de 5 folds dentro del entrenamiento, con grupos = cancion: cada grupo aparece una sola vez en validacion $_{[1]}$, asi que las versiones de una misma cancion nunca quedan separadas.
-- **Bitacora.** Una funcion prueba cada cambio contra la preparacion vigente, aplica la regla y anota el resultado. Se evaluaron 16 preparaciones en validacion cruzada.
+- **Bitacora.** Una funcion prueba cada cambio contra la preparacion vigente, aplica la regla y anota el resultado. Se evaluaron 17 preparaciones en validacion cruzada.
 - **Prueba.** Las seis configuraciones finales (cada modelo con la preparacion de la EV1 y con la suya) se evaluan juntas, una sola vez.
 - **Control.** La preparacion de la EV1 rearmada da en prueba exactamente lo mismo que un modelo entrenado con los archivos de la EV1.
 
@@ -356,6 +369,7 @@ La EV1 mostro que el artista explica mas que el genero y dejo pendiente revisar 
 | Quitar Yeo-Johnson en Ridge (R3) | +0,038 | No: se mantiene |
 | Splines en Ridge (R4) | -0,012 | No |
 | Recuperar `instrumentalness` y `key` (F3, X3) | +0,005 y -0,009 | No |
+| Todos los cambios juntos (5.6) | Ridge -0,034; Random Forest +0,005; XGBoost -0,009 | No: combinar no supera al paso a paso |
 | Quitar `n_generos` (cancion inedita) | +0,248 en XGBoost | Costo pequeño y aceptable |
 
 **Veredicto.** Ningun modelo es apto todavia. **XGBoost con el genero como categoria nativa es el mejor candidato**: MAE de 10,64 en prueba (37% menos que la linea base) y 0,17 puntos mejor que el siguiente en validacion. Cumple MAE y equidad; le faltan R², RMSE, exitos y sobreajuste.
@@ -373,8 +387,8 @@ La EV1 mostro que el artista explica mas que el genero y dejo pendiente revisar 
 **Limitaciones.**
 
 - Parametros y perdida por defecto: el orden entre modelos podria cambiar tras el ajuste (no verificado).
-- El orden de las hipotesis importa: cada cambio se probo sobre la preparacion vigente. Otro orden podria cambiar los resultados pequeños; los dos cambios que mejoran son grandes frente al ruido.
-- R1 y R4 mejoran en los 5 folds, pero menos que el ruido: pueden ser efectos reales, aunque con la regla fijada no alcanzan para adoptarse.
+- El orden de las hipotesis importa: cada cambio se probo sobre la preparacion vigente. La prueba con todo junto (5.6) acota este riesgo: los cambios descartados tampoco mejoran combinados.
+- En Ridge, R1, R2 y R4 juntos mejoran en los 5 folds (-0,034), pero menos que el ruido: pueden ser efectos reales, demasiado pequeños para adoptarse con la regla fijada.
 - Un solo conjunto de prueba (657 exitos); no se estimo su ruido.
 - El EDA de la EV1 se hizo con todo el dataset, antes de dividir: es una fuga leve que ya no se puede evitar.
 - La muestra tiene 1.000 canciones por genero por construccion y no representa el catalogo real. Las relaciones son asociaciones, no causas.
