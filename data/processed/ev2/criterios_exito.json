@@ -1,0 +1,14 @@
+{
+  "R2 prueba (minimo)": 0.4,
+  "RMSE prueba (maximo)": 15.512810263484218,
+  "MAE prueba (maximo)": 13.46034141435176,
+  "brecha R2 entrenamiento - prueba (maximo)": 0.05,
+  "MAE en exitos de popularidad >= 70 (maximo)": 20.0,
+  "brecha MAE entre cuartiles de genero (maximo)": 5.0,
+  "corte de exito": 70,
+  "linea_base": {
+    "MAE": 16.8254267679397,
+    "RMSE": 20.14650683569379,
+    "R2": -0.00029864679321223164
+  }
+}

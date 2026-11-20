@@ -1,0 +1,42 @@
+{
+  "linea_base": {
+    "MAE": 16.8254267679397,
+    "RMSE": 20.14650683569379,
+    "R2": -0.00029864679321223164
+  },
+  "modelos": {
+    "ridge": {
+      "MAE validacion": 11.466849701868156,
+      "ruido": 0.04616134083939361,
+      "RMSE validacion": 16.13325809402024,
+      "MAE test": 11.516458077040976,
+      "RMSE test": 16.26689915227805,
+      "R2 test": 0.34786168239408644,
+      "R2 train": 0.3564597607997789,
+      "MAE test exitos": 32.82112754109595,
+      "brecha MAE cuartiles de genero": 4.407801621836924
+    },
+    "rf": {
+      "MAE validacion": 10.828319389187365,
+      "ruido": 0.07852404332486738,
+      "RMSE validacion": 15.622422845967737,
+      "MAE test": 10.846286100882182,
+      "RMSE test": 15.75633611379275,
+      "R2 test": 0.3881560874401281,
+      "R2 train": 0.9207018139855563,
+      "MAE test exitos": 29.949583967824836,
+      "brecha MAE cuartiles de genero": 3.940436702531997
+    },
+    "xgb": {
+      "MAE validacion": 10.654742006099372,
+      "ruido": 0.0845870594219477,
+      "RMSE validacion": 15.66253436000738,
+      "MAE test": 10.643026351928711,
+      "RMSE test": 15.787534040473249,
+      "R2 test": 0.3857307434082031,
+      "R2 train": 0.6505097150802612,
+      "MAE test exitos": 29.360326766967773,
+      "brecha MAE cuartiles de genero": 3.9838085915534425
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "modelo": "Mezcla A + B",
+  "prediccion": "(promedio de modelos_A + promedio de modelos_B) / 2",
+  "hiperparametros_A": {
+    "modelo__colsample_bytree": 0.9026260635443968,
+    "modelo__learning_rate": 0.1135,
+    "modelo__max_depth": 3,
+    "modelo__min_child_weight": 1.5914,
+    "modelo__n_estimators": 244,
+    "modelo__objective": "reg:squarederror",
+    "modelo__reg_alpha": 3.2311521854410987,
+    "modelo__reg_lambda": 0.5940525755701928,
+    "modelo__subsample": 0.8299920230170895
+  },
+  "hiperparametros_B": {
+    "modelo__colsample_bytree": 0.8154616197341622,
+    "modelo__learning_rate": 0.022413698592405107,
+    "modelo__max_depth": 9,
+    "modelo__min_child_weight": 1.9918054991204603,
+    "modelo__n_estimators": 871,
+    "modelo__objective": "reg:absoluteerror",
+    "modelo__reg_alpha": 0.1707685960990951,
+    "modelo__reg_lambda": 1.6274532171685008,
+    "modelo__subsample": 0.5324461235544908
+  },
+  "semillas_A": [
+    42,
+    1,
+    2,
+    3,
+    4
+  ],
+  "semillas_B": [
+    42,
+    1,
+    2
+  ],
+  "dispositivo": "cuda",
+  "metricas_prueba": {
+    "R2": 0.4079682230949402,
+    "RMSE": 15.499133882586081,
+    "MAE": 10.270602185099545,
+    "brecha_R2": 0.169613778591156,
+    "MAE_exitos": 29.966211573718347,
+    "brecha_cuartiles": 3.9626303977315267
+  }
+}
